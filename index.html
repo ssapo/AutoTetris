@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChromaPeel Web</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow">ChromaPeel Web</p>
+      <h1>PNG 크로마키 제거를 브라우저에서 바로</h1>
+      <p class="hero-copy">
+        원본 Python 배치 도구를 웹페이지용으로 옮긴 버전입니다.
+        PNG를 올리고 배경색을 지정한 뒤, 브라우저 안에서 바로 투명 처리하고 PNG로 내려받을 수 있습니다.
+      </p>
+    </section>
+
+    <section class="panel controls-panel">
+      <div class="upload-card" id="dropZone">
+        <input id="fileInput" type="file" accept=".png,image/png" multiple hidden>
+        <p class="upload-title">PNG 업로드</p>
+        <p class="upload-copy">파일을 끌어다 놓거나 버튼으로 선택하세요</p>
+        <button id="selectButton" class="primary-button" type="button">PNG 선택</button>
+      </div>
+
+      <div class="settings-grid">
+        <label class="setting">
+          <span>배경색</span>
+          <div class="color-row">
+            <input id="colorPicker" type="color" value="#ff25ff">
+            <input id="hexInput" class="text-input" type="text" value="#FF25FF" maxlength="7">
+          </div>
+        </label>
+
+        <label class="setting">
+          <span>허용 오차</span>
+          <input id="toleranceInput" type="range" min="0" max="255" value="20">
+          <strong id="toleranceValue">20</strong>
+        </label>
+
+        <label class="setting">
+          <span>Feather</span>
+          <input id="featherInput" type="range" min="0" max="255" value="100">
+          <strong id="featherValue">100</strong>
+        </label>
+
+        <label class="setting">
+          <span>Edge Erosion</span>
+          <input id="erosionInput" type="range" min="0" max="6" value="1">
+          <strong id="erosionValue">1</strong>
+        </label>
+
+        <label class="toggle">
+          <input id="decontaminateInput" type="checkbox" checked>
+          <span>Color Decontamination 사용</span>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="processButton" class="primary-button" type="button" disabled>처리 시작</button>
+        <button id="downloadAllButton" class="secondary-button" type="button" disabled>처리본 전체 다운로드</button>
+      </div>
+    </section>
+
+    <section class="panel info-strip">
+      <div>
+        <p class="info-label">배포 방식</p>
+        <p class="info-value">정적 웹페이지</p>
+      </div>
+      <div>
+        <p class="info-label">처리 위치</p>
+        <p class="info-value">브라우저 내부</p>
+      </div>
+      <div>
+        <p class="info-label">서버 업로드</p>
+        <p class="info-value">없음</p>
+      </div>
+    </section>
+
+    <section class="results">
+      <header class="results-header">
+        <div>
+          <p class="eyebrow">Results</p>
+          <h2>미리보기와 다운로드</h2>
+        </div>
+        <p id="statusText" class="status-text">파일을 올리면 여기에서 원본과 결과를 비교할 수 있습니다.</p>
+      </header>
+      <div id="resultsGrid" class="results-grid"></div>
+    </section>
+  </main>
+
+  <template id="resultCardTemplate">
+    <article class="result-card">
+      <div class="result-header">
+        <div>
+          <h3 class="file-name"></h3>
+          <p class="file-meta"></p>
+        </div>
+        <span class="badge">Ready</span>
+      </div>
+
+      <div class="preview-grid">
+        <figure class="preview">
+          <figcaption>원본</figcaption>
+          <img class="before-image" alt="원본 미리보기">
+        </figure>
+        <figure class="preview checker">
+          <figcaption>처리 결과</figcaption>
+          <img class="after-image" alt="처리 결과 미리보기">
+        </figure>
+      </div>
+
+      <div class="card-actions">
+        <button class="secondary-button download-button" type="button">PNG 다운로드</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="./script.js"></script>
+</body>
+</html>
