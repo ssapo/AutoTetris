@@ -87,12 +87,11 @@ function loadSelectedFiles(fileList) {
   updateActionState();
   setStatus(`${incoming.length}개의 파일이 준비되었습니다. 원본 미리보기를 확인한 뒤 처리 시작을 누르세요.`);
 
-  Promise.all(
-    state.files.map(async item => {
-      item.previewUrl = await readFileAsDataUrl(item.file);
-      return item;
-    })
-  ).then(renderResults);
+  state.files.forEach(item => {
+    item.previewUrl = URL.createObjectURL(item.file);
+  });
+
+  renderResults();
 }
 
 function readFileAsDataUrl(file) {
@@ -257,6 +256,7 @@ function renderResults() {
       node.querySelector(".file-name").textContent = entry.file.name;
       node.querySelector(".file-meta").textContent = `원본 ${formatBytes(entry.file.size)}`;
       node.querySelector(".before-image").src = entry.previewUrl;
+      node.querySelector(".before-image").classList.remove("is-hidden");
       node.querySelector(".after-image").classList.add("is-hidden");
       node.querySelector(".empty-note").classList.add("is-visible");
       const button = node.querySelector(".download-button");
@@ -273,6 +273,8 @@ function renderResults() {
     node.querySelector(".file-meta").textContent = `${result.width} × ${result.height} · 원본 ${formatBytes(result.originalSize)}`;
     node.querySelector(".before-image").src = result.beforeUrl;
     node.querySelector(".after-image").src = result.afterUrl;
+    node.querySelector(".before-image").classList.remove("is-hidden");
+    node.querySelector(".after-image").classList.remove("is-hidden");
     node.querySelector(".empty-note").classList.remove("is-visible");
     node.querySelector(".download-button").addEventListener("click", () => {
       downloadBlob(result.afterBlob, appendSuffix(result.fileName, "-alpha"));
@@ -320,7 +322,7 @@ elements.fileInput.addEventListener("change", event => loadSelectedFiles(event.t
 elements.processButton.addEventListener("click", () => {
   processAll().catch(error => {
     console.error(error);
-    setStatus("처리 중 오류가 발생했습니다. PNG 파일인지 다시 확인해 주세요.");
+    setStatus("처리 중 오류가 발생했습니다. PNG, JPG, JPEG 파일인지 다시 확인해 주세요.");
   });
 });
 elements.downloadAllButton.addEventListener("click", downloadAll);
