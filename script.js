@@ -67,20 +67,32 @@ function setStatus(text) {
 
 function loadSelectedFiles(fileList) {
   const incoming = Array.from(fileList).filter(
-    file => file.type === "image/png" || file.name.toLowerCase().endsWith(".png")
+    file =>
+      file.type === "image/png" ||
+      file.type === "image/jpeg" ||
+      file.name.toLowerCase().endsWith(".png") ||
+      file.name.toLowerCase().endsWith(".jpg") ||
+      file.name.toLowerCase().endsWith(".jpeg")
   );
 
   if (incoming.length === 0) {
-    setStatus("PNG 파일만 처리할 수 있습니다.");
+    setStatus("PNG, JPG, JPEG 파일만 처리할 수 있습니다.");
     return;
   }
 
-  state.files = incoming;
+  state.files = incoming.map(file => ({ file, previewUrl: "" }));
   state.results.forEach(result => URL.revokeObjectURL(result.afterUrl));
   state.results = [];
   elements.resultsGrid.innerHTML = "";
   updateActionState();
-  setStatus(`${incoming.length}개의 PNG 파일이 준비되었습니다. 처리 시작을 누르면 바로 결과를 만듭니다.`);
+  setStatus(`${incoming.length}개의 파일이 준비되었습니다. 원본 미리보기를 확인한 뒤 처리 시작을 누르세요.`);
+
+  Promise.all(
+    state.files.map(async item => {
+      item.previewUrl = await readFileAsDataUrl(item.file);
+      return item;
+    })
+  ).then(renderResults);
 }
 
 function readFileAsDataUrl(file) {
@@ -239,12 +251,29 @@ function downloadBlob(blob, fileName) {
 function renderResults() {
   elements.resultsGrid.innerHTML = "";
 
+  if (state.results.length === 0) {
+    for (const entry of state.files) {
+      const node = elements.template.content.firstElementChild.cloneNode(true);
+      node.querySelector(".file-name").textContent = entry.file.name;
+      node.querySelector(".file-meta").textContent = `원본 ${formatBytes(entry.file.size)}`;
+      node.querySelector(".before-image").src = entry.previewUrl;
+      node.querySelector(".after-image").classList.add("is-hidden");
+      node.querySelector(".empty-note").classList.add("is-visible");
+      const button = node.querySelector(".download-button");
+      button.textContent = "처리 후 다운로드";
+      button.disabled = true;
+      elements.resultsGrid.appendChild(node);
+    }
+    return;
+  }
+
   for (const result of state.results) {
     const node = elements.template.content.firstElementChild.cloneNode(true);
     node.querySelector(".file-name").textContent = result.fileName;
     node.querySelector(".file-meta").textContent = `${result.width} × ${result.height} · 원본 ${formatBytes(result.originalSize)}`;
     node.querySelector(".before-image").src = result.beforeUrl;
     node.querySelector(".after-image").src = result.afterUrl;
+    node.querySelector(".empty-note").classList.remove("is-visible");
     node.querySelector(".download-button").addEventListener("click", () => {
       downloadBlob(result.afterBlob, appendSuffix(result.fileName, "-alpha"));
     });
@@ -267,9 +296,9 @@ async function processAll() {
   updateActionState();
 
   for (let i = 0; i < state.files.length; i += 1) {
-    const file = state.files[i];
-    setStatus(`[${i + 1}/${state.files.length}] ${file.name} 처리 중...`);
-    const result = await processFile(file, options);
+    const item = state.files[i];
+    setStatus(`[${i + 1}/${state.files.length}] ${item.file.name} 처리 중...`);
+    const result = await processFile(item.file, options);
     state.results.push(result);
     renderResults();
   }

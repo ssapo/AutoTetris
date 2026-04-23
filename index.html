@@ -11,20 +11,11 @@
 </head>
 <body>
   <main class="shell">
-    <section class="hero">
-      <p class="eyebrow">ChromaPeel Web</p>
-      <h1>PNG 크로마키 제거를 브라우저에서 바로</h1>
-      <p class="hero-copy">
-        원본 Python 배치 도구를 웹페이지용으로 옮긴 버전입니다.
-        PNG를 올리고 배경색을 지정한 뒤, 브라우저 안에서 바로 투명 처리하고 PNG로 내려받을 수 있습니다.
-      </p>
-    </section>
-
     <section class="panel controls-panel">
       <div class="upload-card" id="dropZone">
-        <input id="fileInput" type="file" accept=".png,image/png" multiple hidden>
-        <p class="upload-title">PNG 업로드</p>
-        <p class="upload-copy">파일을 끌어다 놓거나 버튼으로 선택하세요</p>
+        <input id="fileInput" type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" multiple hidden>
+        <p class="upload-title">PNG · JPG</p>
+        <p class="upload-copy">드롭 또는 선택</p>
         <button id="selectButton" class="primary-button" type="button">PNG 선택</button>
       </div>
 
@@ -67,27 +58,8 @@
       </div>
     </section>
 
-    <section class="panel info-strip">
-      <div>
-        <p class="info-label">배포 방식</p>
-        <p class="info-value">정적 웹페이지</p>
-      </div>
-      <div>
-        <p class="info-label">처리 위치</p>
-        <p class="info-value">브라우저 내부</p>
-      </div>
-      <div>
-        <p class="info-label">서버 업로드</p>
-        <p class="info-value">없음</p>
-      </div>
-    </section>
-
     <section class="results">
       <header class="results-header">
-        <div>
-          <p class="eyebrow">Results</p>
-          <h2>미리보기와 다운로드</h2>
-        </div>
         <p id="statusText" class="status-text">파일을 올리면 여기에서 원본과 결과를 비교할 수 있습니다.</p>
       </header>
       <div id="resultsGrid" class="results-grid"></div>
@@ -101,17 +73,17 @@
           <h3 class="file-name"></h3>
           <p class="file-meta"></p>
         </div>
-        <span class="badge">Ready</span>
       </div>
 
       <div class="preview-grid">
         <figure class="preview">
-          <figcaption>원본</figcaption>
+          <figcaption>Before</figcaption>
           <img class="before-image" alt="원본 미리보기">
         </figure>
         <figure class="preview checker">
-          <figcaption>처리 결과</figcaption>
+          <figcaption>After</figcaption>
           <img class="after-image" alt="처리 결과 미리보기">
+          <div class="empty-note">처리 전</div>
         </figure>
       </div>
 
